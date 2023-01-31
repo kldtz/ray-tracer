@@ -17,7 +17,7 @@ pub fn ray_color(ray: Ray) -> Vec3 {
     (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
 }
 
-/// Optionally returns parameter t at which ray intersects sphere.
+/// Optionally returns parameter t at which ray intersects sphere (closest hit).
 pub fn hit_sphere(center: Vec3, radius: f64, ray: &Ray) -> Option<f64> {
     let oc = ray.origin - center;
     let a = ray.direction.length_squared();
