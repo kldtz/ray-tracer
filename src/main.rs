@@ -1,10 +1,17 @@
+use rand::prelude::*;
+
+use crate::camera::Camera;
+use crate::color::get_color;
 use crate::hits::{Hittable, Hittables, Sphere};
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
 pub mod vec3;
+pub mod utils;
+pub mod color;
 pub mod ray;
 pub mod hits;
+pub mod camera;
 
 pub fn ray_color<T: Hittable>(ray: Ray, world: &Hittables<T>) -> Vec3 {
     if let Some(hit) = world.hit(&ray, 0.0, f64::MAX) {
@@ -35,42 +42,35 @@ fn first_image() {
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
     let image_height = (image_width as f64 / aspect_ratio) as i64;
+    let samples_per_pixel = 100;
 
     // World
     let hittables = vec![
-        Sphere { center: Vec3::new(0.0, 0.0, -1.0, ), radius: 0.5 },
-        Sphere { center: Vec3::new(0.0, -100.5, -1.0), radius: 100.0},
+        Sphere { center: Vec3::new(0.0, 0.0, -1.0), radius: 0.5 },
+        Sphere { center: Vec3::new(0.0, -100.5, -1.0), radius: 100.0 },
     ];
     let world = Hittables { hittables };
 
     // Camera
-    let viewport_height = 2.0;
-    let viewport_width = aspect_ratio * viewport_height;
-    let focal_length = 1.0;
-
-    // Position of eye/camera
-    let origin = Vec3::new(0.0, 0.0, 0.0);
-    // Left: negative x, right: positive x
-    let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
-    // Up: positive y, down: negative y
-    let vertical = Vec3::new(0.0, viewport_height, 0.0);
-    // Lower left corner of the viewport, the viewport is at negative z-value focal_length
-    let lower_left_corner = origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
-
+    let camera = Camera::new();
 
     // Render
     eprintln!("Rendering {}x{} image", image_width, image_height);
     println!("P3\n{} {}\n255", image_width, image_height);
 
+    let mut rng = rand::thread_rng();
+
     for j in (0..image_height).rev() {
         for i in 0..image_width {
-            let u = i as f64 / (image_width as f64 - 1.0);
-            let v = j as f64 / (image_height as f64 - 1.0);
-            // Vector from origin to pixel
-            let direction = lower_left_corner + u * horizontal + v * vertical - origin;
-            let ray = Ray { origin, direction };
-            let ray_color = ray_color(ray, &world);
-            println!("{}", ray_color.to_color());
+            let mut pixel_color = Vec3::new(0.0, 0.0, 0.0);
+            for _s in 0..samples_per_pixel {
+                let u = (i as f64 + rng.gen_range(0.0..1.0)) / (image_width as f64 - 1.0);
+                let v = (j as f64 + rng.gen_range(0.0..1.0)) / (image_height as f64 - 1.0);
+                // Vector from origin to pixel
+                let ray = camera.get_ray(u, v);
+                pixel_color = pixel_color + ray_color(ray, &world);
+            }
+            println!("{}", get_color(pixel_color, samples_per_pixel));
         }
     }
     eprintln!("Done");

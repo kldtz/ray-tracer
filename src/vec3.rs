@@ -2,8 +2,6 @@ use std::fmt;
 use std::fmt::Formatter;
 use std::ops::{Add, Div, Index, Mul, Neg, Sub};
 
-const COL_FACTOR: f64 = 255.99;
-
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Vec3 {
     pub x: f64,
@@ -99,11 +97,6 @@ impl Vec3 {
 
     pub fn unit_vector(self) -> Self {
         self / self.length()
-    }
-
-    pub fn to_color(self) -> String {
-        let color = self * COL_FACTOR;
-        format!("{} {} {}", color.x as i64, color.y as i64, color.z as i64)
     }
 }
 
