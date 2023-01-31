@@ -4,7 +4,7 @@ use std::ops::{Add, Div, Index, Mul, Neg, Sub};
 
 const COL_FACTOR: f64 = 255.99;
 
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
@@ -24,17 +24,7 @@ impl Index<usize> for Vec3 {
     }
 }
 
-// TODO: use some kind of macro to cover all value-ref combinations
-
 impl Neg for Vec3 {
-    type Output = Vec3;
-
-    fn neg(self) -> Self::Output {
-        Vec3 { x: -self.x, y: -self.y, z: -self.z }
-    }
-}
-
-impl<'a> Neg for &'a Vec3 {
     type Output = Vec3;
 
     fn neg(self) -> Self::Output {
@@ -50,23 +40,7 @@ impl Add for Vec3 {
     }
 }
 
-impl<'a> Add for &'a Vec3 {
-    type Output = Vec3;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        Vec3 { x: self.x + rhs.x, y: self.y + rhs.y, z: self.z + rhs.z }
-    }
-}
-
 impl Sub for Vec3 {
-    type Output = Vec3;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        Vec3 { x: self.x - rhs.x, y: self.y - rhs.y, z: self.z - rhs.z }
-    }
-}
-
-impl<'a> Sub for &'a Vec3 {
     type Output = Vec3;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -82,15 +56,6 @@ impl Mul<Vec3> for f64 {
     }
 }
 
-impl<'a> Mul<&'a Vec3> for f64 {
-    type Output = Vec3;
-
-    fn mul(self, rhs: &'a Vec3) -> Self::Output {
-        rhs * self
-    }
-}
-
-
 impl Mul<f64> for Vec3 {
     type Output = Vec3;
 
@@ -99,23 +64,7 @@ impl Mul<f64> for Vec3 {
     }
 }
 
-impl<'a> Mul<f64> for &'a Vec3 {
-    type Output = Vec3;
-
-    fn mul(self, scalar: f64) -> Self::Output {
-        Vec3 { x: self.x * scalar, y: self.y * scalar, z: self.z * scalar }
-    }
-}
-
 impl Div<f64> for Vec3 {
-    type Output = Vec3;
-
-    fn div(self, scalar: f64) -> Self::Output {
-        Vec3 { x: self.x / scalar, y: self.y / scalar, z: self.z / scalar }
-    }
-}
-
-impl<'a> Div<f64> for &'a Vec3 {
     type Output = Vec3;
 
     fn div(self, scalar: f64) -> Self::Output {
@@ -148,11 +97,11 @@ impl Vec3 {
         }
     }
 
-    pub fn unit_vector(&self) -> Self {
+    pub fn unit_vector(self) -> Self {
         self / self.length()
     }
 
-    pub fn to_color(&self) -> String {
+    pub fn to_color(self) -> String {
         let color = self * COL_FACTOR;
         format!("{} {} {}", color.x as i64, color.y as i64, color.z as i64)
     }
@@ -180,18 +129,8 @@ mod tests {
     }
 
     #[test]
-    fn test_neg_ref() {
-        assert_eq!(-&V1, Vec3::new(-1.0, -2.0, -3.0));
-    }
-
-    #[test]
     fn test_add_value() {
         assert_eq!(V1 + V2, Vec3::new(2.0, 4.0, 6.0));
-    }
-
-    #[test]
-    fn test_add_ref() {
-        assert_eq!(&V1 + &V1, Vec3::new(2.0, 4.0, 6.0));
     }
 
     #[test]
@@ -200,28 +139,13 @@ mod tests {
     }
 
     #[test]
-    fn test_sub_ref() {
-        assert_eq!(&V1 - &V2, Vec3::new(0.0, 0.0, 0.0));
-    }
-
-    #[test]
     fn test_mul_val() {
         assert_eq!(V1 * 3.0, Vec3::new(3.0, 6.0, 9.0));
     }
 
     #[test]
-    fn test_mul_ref() {
-        assert_eq!(&V1 * 3.0, Vec3::new(3.0, 6.0, 9.0));
-    }
-
-    #[test]
     fn test_div_val() {
         assert_eq!(V1 / 2.0, Vec3::new(0.5, 1.0, 1.5));
-    }
-
-    #[test]
-    fn test_div_ref() {
-        assert_eq!(&V1 / 2.0, Vec3::new(0.5, 1.0, 1.5));
     }
 
     #[test]

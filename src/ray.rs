@@ -1,13 +1,13 @@
 use crate::Vec3;
 
-pub struct Ray<'a> {
-    pub origin: &'a Vec3,
-    pub direction: &'a Vec3,
+pub struct Ray {
+    pub origin: Vec3,
+    pub direction: Vec3,
 }
 
-impl Ray<'_> {
+impl Ray {
     pub fn at(&self, t: f64) -> Vec3 {
-        self.origin + &(self.direction * t)
+        self.origin + (self.direction * t)
     }
 
     pub fn color(&self) -> Vec3 {
