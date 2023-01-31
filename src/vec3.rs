@@ -2,6 +2,9 @@ use std::fmt;
 use std::fmt::Formatter;
 use std::ops::{Add, Div, Index, Mul, Neg, Sub};
 
+use rand::distributions::uniform::SampleRange;
+use rand::prelude::*;
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Vec3 {
     pub x: f64,
@@ -73,6 +76,25 @@ impl Div<f64> for Vec3 {
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3 { x, y, z }
+    }
+
+    pub fn random<R>(rng: &mut ThreadRng, range: R) -> Self
+        where R: SampleRange<f64> + std::clone::Clone
+    {
+        Vec3 {
+            x: rng.gen_range(range.clone()),
+            y: rng.gen_range(range.clone()),
+            z: rng.gen_range(range),
+        }
+    }
+
+    pub fn random_in_unit_sphere(rng: &mut ThreadRng) -> Self {
+        loop {
+            let p = Vec3::random(rng, -1.0..1.0);
+            if p.length_squared() < 1.0 {
+                return p;
+            }
+        }
     }
 
     pub fn length(&self) -> f64 {

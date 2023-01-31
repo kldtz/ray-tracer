@@ -13,9 +13,13 @@ pub mod ray;
 pub mod hits;
 pub mod camera;
 
-pub fn ray_color<T: Hittable>(ray: Ray, world: &Hittables<T>) -> Vec3 {
-    if let Some(hit) = world.hit(&ray, 0.0, f64::MAX) {
-        return 0.5 * (hit.normal + Vec3::new(1.0, 1.0, 1.0));
+pub fn ray_color<T: Hittable>(ray: Ray, world: &Hittables<T>, rng: &mut ThreadRng, depth: i64) -> Vec3 {
+    if depth <= 0 {
+        return Vec3::new(0.0, 0.0, 0.0);
+    }
+    if let Some(hit) = world.hit(&ray, 0.001, f64::MAX) {
+        let target = hit.point + hit.normal + Vec3::random_in_unit_sphere(rng);
+        return 0.5 * ray_color(Ray { origin: hit.point, direction: target - hit.point }, world, rng, depth-1);
     }
     let unit_direction = ray.direction.unit_vector();
     // Transform y-value from range [-1, 1] to [0, 1]
@@ -43,6 +47,7 @@ fn first_image() {
     let image_width = 400;
     let image_height = (image_width as f64 / aspect_ratio) as i64;
     let samples_per_pixel = 100;
+    let max_depth = 50;
 
     // World
     let hittables = vec![
@@ -68,7 +73,7 @@ fn first_image() {
                 let v = (j as f64 + rng.gen_range(0.0..1.0)) / (image_height as f64 - 1.0);
                 // Vector from origin to pixel
                 let ray = camera.get_ray(u, v);
-                pixel_color = pixel_color + ray_color(ray, &world);
+                pixel_color = pixel_color + ray_color(ray, &world, &mut rng, max_depth);
             }
             println!("{}", get_color(pixel_color, samples_per_pixel));
         }
