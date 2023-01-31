@@ -97,6 +97,16 @@ impl Vec3 {
         }
     }
 
+    pub fn random_in_hemisphere(rng: &mut ThreadRng, normal: Vec3) -> Self {
+        let in_unit_sphere = Vec3::random_in_unit_sphere(rng);
+        // In same hemisphere as normal
+        if in_unit_sphere.dot(normal) > 0.0 {
+            in_unit_sphere
+        } else {
+            -in_unit_sphere
+        }
+    }
+
     pub fn length(&self) -> f64 {
         f64::sqrt(self.length_squared())
     }

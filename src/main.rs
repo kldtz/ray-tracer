@@ -18,7 +18,9 @@ pub fn ray_color<T: Hittable>(ray: Ray, world: &Hittables<T>, rng: &mut ThreadRn
         return Vec3::new(0.0, 0.0, 0.0);
     }
     if let Some(hit) = world.hit(&ray, 0.001, f64::MAX) {
-        let target = hit.point + hit.normal + Vec3::random_in_unit_sphere(rng);
+        let target = hit.point + hit.normal + Vec3::random_in_unit_sphere(rng).unit_vector();
+        // Alternative
+        //let target = hit.point + hit.normal + Vec3::random_in_hemisphere(rng, hit.normal);
         return 0.5 * ray_color(Ray { origin: hit.point, direction: target - hit.point }, world, rng, depth-1);
     }
     let unit_direction = ray.direction.unit_vector();
