@@ -107,9 +107,6 @@ impl Vec3 {
     }
 }
 
-pub type Point = Vec3;
-pub type Color = Vec3;
-
 impl fmt::Display for Vec3 {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         writeln!(f, "{} {} {}", self.x, self.y, self.z)
