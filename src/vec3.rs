@@ -5,11 +5,19 @@ use std::ops::{Add, Div, Index, Mul, Neg, Sub};
 use rand::distributions::uniform::SampleRange;
 use rand::prelude::*;
 
+const EPSILON: f64 = 1.0e-8;
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
     pub z: f64,
+}
+
+impl Vec3 {
+    pub(crate) fn near_zero(&self) -> bool {
+        self.x.abs() < EPSILON && self.y.abs() < EPSILON && self.z.abs() < EPSILON
+    }
 }
 
 impl Index<usize> for Vec3 {
@@ -62,6 +70,14 @@ impl Mul<f64> for Vec3 {
 
     fn mul(self, scalar: f64) -> Self::Output {
         Vec3 { x: self.x * scalar, y: self.y * scalar, z: self.z * scalar }
+    }
+}
+
+impl Mul<Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        Vec3::new(self.x * rhs.x, self.y * rhs.y, self.z * rhs.z)
     }
 }
 
@@ -146,27 +162,32 @@ mod tests {
     const V2: Vec3 = Vec3 { x: 1.0, y: 2.0, z: 3.0 };
 
     #[test]
-    fn test_neg_value() {
+    fn test_neg() {
         assert_eq!(-V1, Vec3::new(-1.0, -2.0, -3.0))
     }
 
     #[test]
-    fn test_add_value() {
+    fn test_add() {
         assert_eq!(V1 + V2, Vec3::new(2.0, 4.0, 6.0));
     }
 
     #[test]
-    fn test_sub_value() {
+    fn test_sub() {
         assert_eq!(V1 - V2, Vec3::new(0.0, 0.0, 0.0));
     }
 
     #[test]
-    fn test_mul_val() {
+    fn test_scalar_mul() {
         assert_eq!(V1 * 3.0, Vec3::new(3.0, 6.0, 9.0));
     }
 
     #[test]
-    fn test_div_val() {
+    fn test_vec_mul() {
+        assert_eq!(V1 * V2, Vec3::new(1.0, 4.0, 9.0));
+    }
+
+    #[test]
+    fn test_div() {
         assert_eq!(V1 / 2.0, Vec3::new(0.5, 1.0, 1.5));
     }
 
