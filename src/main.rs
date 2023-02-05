@@ -7,13 +7,13 @@ use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
-pub mod vec3;
-pub mod utils;
-pub mod color;
-pub mod ray;
+mod vec3;
+mod utils;
+mod color;
+mod ray;
 mod material;
-pub mod hits;
-pub mod camera;
+mod hits;
+mod camera;
 
 pub fn ray_color<T: Hittable>(ray: Ray, world: &Hittables<T>, rng: &mut ThreadRng, depth: i64) -> Vec3 {
     if depth <= 0 {
@@ -43,8 +43,8 @@ fn main() {
     // Materials
     let ground = Material::Lambertian { albedo: Vec3::new(0.8, 0.8, 0.0) };
     let center = Material::Lambertian { albedo: Vec3::new(0.7, 0.3, 0.3) };
-    let left_metal = Material::Metal { albedo: Vec3::new(0.8, 0.8, 0.8) };
-    let right_metal = Material::Metal { albedo: Vec3::new(0.8, 0.6, 0.2) };
+    let left_metal = Material::Metal { albedo: Vec3::new(0.8, 0.8, 0.8), fuzz: 0.3 };
+    let right_metal = Material::Metal { albedo: Vec3::new(0.8, 0.6, 0.2), fuzz: 1.0 };
 
     // World
     let hittables = vec![

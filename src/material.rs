@@ -5,7 +5,7 @@ use crate::hits::Hit;
 
 pub enum Material {
     Lambertian { albedo: Vec3 },
-    Metal { albedo: Vec3 },
+    Metal { albedo: Vec3, fuzz: f64 },
 }
 
 impl Material {
@@ -18,10 +18,13 @@ impl Material {
                 }
                 Some(Ray { origin: hit.point, direction: scatter_direction })
             }
-            Material::Metal { albedo: _ } => {
+            Material::Metal { albedo: _, fuzz } => {
                 let reflected = reflect(ray.direction.unit_vector(), hit.normal);
                 if reflected.dot(hit.normal) > 0.0 {
-                    Some(Ray { origin: hit.point, direction: reflected })
+                    Some(Ray {
+                        origin: hit.point,
+                        direction: reflected + fuzz * Vec3::random_in_unit_sphere(rng),
+                    })
                 } else {
                     None
                 }
@@ -31,7 +34,7 @@ impl Material {
 
     pub fn attenuate(&self, color: Vec3) -> Vec3 {
         match *self {
-            Material::Lambertian { albedo } | Material::Metal { albedo } => albedo * color,
+            Material::Lambertian { albedo } | Material::Metal { albedo, .. } => albedo * color,
         }
     }
 }
