@@ -6,6 +6,7 @@ use crate::hits::Hit;
 pub enum Material {
     Lambertian { albedo: Vec3 },
     Metal { albedo: Vec3, fuzz: f64 },
+    Dielectric { refractive_index: f64 },
 }
 
 impl Material {
@@ -29,16 +30,39 @@ impl Material {
                     None
                 }
             }
+            Material::Dielectric { refractive_index } => {
+                let refraction_ratio = if hit.front_face { 1.0 / refractive_index } else { refractive_index };
+
+                let unit_direction = ray.direction.unit_vector();
+                let cos_theta = f64::min(-unit_direction.dot(hit.normal), 1.0);
+                let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+
+                let cannot_refract = refraction_ratio * sin_theta > 1.0;
+                let direction = if cannot_refract {
+                    reflect(unit_direction, hit.normal)
+                } else {
+                    refract(unit_direction, hit.normal, refraction_ratio)
+                };
+                Some(Ray { origin: hit.point, direction })
+            }
         }
     }
 
     pub fn attenuate(&self, color: Vec3) -> Vec3 {
         match *self {
             Material::Lambertian { albedo } | Material::Metal { albedo, .. } => albedo * color,
+            Material::Dielectric { .. } => color,
         }
     }
 }
 
 fn reflect(v: Vec3, normal: Vec3) -> Vec3 {
     v - 2.0 * v.dot(normal) * normal
+}
+
+fn refract(uv: Vec3, normal: Vec3, etai_over_etat: f64) -> Vec3 {
+    let cos_theta = (-uv).dot(normal).min(1.0);
+    let r_out_perp = etai_over_etat * (uv + cos_theta * normal);
+    let r_out_parallel = -((1.0 - r_out_perp.length_squared()).abs().sqrt()) * normal;
+    r_out_perp + r_out_parallel
 }

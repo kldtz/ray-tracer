@@ -33,19 +33,19 @@ impl Hittable for Sphere<'_> {
         let sqrtd = discriminant.sqrt();
 
         // Find nearest root that lies in acceptable range.
-        let root = (-half_b - sqrtd) / a;
+        let mut root = (-half_b - sqrtd) / a;
         if root < t_min || t_max < root {
-            let root = (-half_b + sqrtd) / a;
+            root = (-half_b + sqrtd) / a;
             if root < t_min || t_max < root {
                 return None;
             }
         }
 
         let point = ray.at(root);
-        let normal = (point - self.center) / self.radius;
+        let outward_normal = (point - self.center) / self.radius;
         let t = root;
-        let front_face = ray.direction.dot(normal) < 0.0;
-        let normal = if front_face { normal } else { -normal };
+        let front_face = ray.direction.dot(outward_normal) < 0.0;
+        let normal = if front_face { outward_normal } else { -outward_normal };
 
         Some(Hit { point, normal, t, front_face, material: self.material })
     }
@@ -69,4 +69,3 @@ impl<T: Hittable> Hittable for Hittables<T> {
         hit
     }
 }
-

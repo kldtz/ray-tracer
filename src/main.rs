@@ -43,15 +43,15 @@ fn main() {
     // Materials
     let ground = Material::Lambertian { albedo: Vec3::new(0.8, 0.8, 0.0) };
     let center = Material::Lambertian { albedo: Vec3::new(0.7, 0.3, 0.3) };
-    let left_metal = Material::Metal { albedo: Vec3::new(0.8, 0.8, 0.8), fuzz: 0.3 };
-    let right_metal = Material::Metal { albedo: Vec3::new(0.8, 0.6, 0.2), fuzz: 1.0 };
+    let metal = Material::Metal { albedo: Vec3::new(0.8, 0.8, 0.8), fuzz: 0.3 };
+    let glass = Material::Dielectric { refractive_index: 1.5 };
 
     // World
     let hittables = vec![
         Sphere { center: Vec3::new(0.0, 0.0, -1.0), radius: 0.5, material: &center },
         Sphere { center: Vec3::new(0.0, -100.5, -1.0), radius: 100.0, material: &ground },
-        Sphere { center: Vec3::new(-1.0, 0.0, -1.0), radius: 0.5, material: &left_metal },
-        Sphere { center: Vec3::new(1.0, 0.0, -1.0), radius: 0.5, material: &right_metal },
+        Sphere { center: Vec3::new(-1.0, 0.0, -1.0), radius: 0.5, material: &metal },
+        Sphere { center: Vec3::new(1.0, 0.0, -1.0), radius: 0.5, material: &glass },
     ];
     let world = Hittables { hittables };
 
