@@ -1,3 +1,4 @@
+use rand::Rng;
 use rand::rngs::ThreadRng;
 
 use crate::{Ray, Vec3};
@@ -38,7 +39,8 @@ impl Material {
                 let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
                 let cannot_refract = refraction_ratio * sin_theta > 1.0;
-                let direction = if cannot_refract {
+                let direction = if cannot_refract
+                    || reflectance(cos_theta, refraction_ratio) > rng.gen_range(0.0..1.0) {
                     reflect(unit_direction, hit.normal)
                 } else {
                     refract(unit_direction, hit.normal, refraction_ratio)
@@ -65,4 +67,10 @@ fn refract(uv: Vec3, normal: Vec3, etai_over_etat: f64) -> Vec3 {
     let r_out_perp = etai_over_etat * (uv + cos_theta * normal);
     let r_out_parallel = -((1.0 - r_out_perp.length_squared()).abs().sqrt()) * normal;
     r_out_perp + r_out_parallel
+}
+
+fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
+    // Use Schlick's approximation for reflectance
+    let r0 = ((1.0 - ref_idx) / (1.0 + ref_idx)).powi(2);
+    r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
 }
