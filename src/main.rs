@@ -43,7 +43,7 @@ fn main() {
     // Materials
     let ground = Material::Lambertian { albedo: Vec3::new(0.8, 0.8, 0.0) };
     let center = Material::Lambertian { albedo: Vec3::new(0.7, 0.3, 0.3) };
-    let metal = Material::Metal { albedo: Vec3::new(0.8, 0.8, 0.8), fuzz: 0.3 };
+    let metal = Material::Metal { albedo: Vec3::new(0.8, 0.8, 0.8), fuzz: 0.1 };
     let glass = Material::Dielectric { refractive_index: 1.5 };
 
     // World
@@ -56,7 +56,13 @@ fn main() {
     let world = Hittables { hittables };
 
     // Camera
-    let camera = Camera::new();
+    let camera = Camera::new(
+        Vec3::new(-2.0, 2.0, 1.0),
+        Vec3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        20.0,
+        16.0 / 9.0
+    );
 
     // Render
     eprintln!("Rendering {}x{} image", image_width, image_height);
