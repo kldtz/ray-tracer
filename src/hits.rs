@@ -13,13 +13,13 @@ pub struct Hit<'a> {
     pub material: &'a Material,
 }
 
-pub struct Sphere<'a> {
+pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
-    pub material: &'a Material,
+    pub material: Material,
 }
 
-impl Hittable for Sphere<'_> {
+impl Hittable for Sphere {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
         let oc = ray.origin - self.center;
         let a = ray.direction.length_squared();
@@ -47,7 +47,7 @@ impl Hittable for Sphere<'_> {
         let front_face = ray.direction.dot(outward_normal) < 0.0;
         let normal = if front_face { outward_normal } else { -outward_normal };
 
-        Some(Hit { point, normal, t, front_face, material: self.material })
+        Some(Hit { point, normal, t, front_face, material: &self.material })
     }
 }
 
