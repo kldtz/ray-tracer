@@ -56,12 +56,16 @@ fn main() {
     let world = Hittables { hittables };
 
     // Camera
+    let lookfrom = Vec3::new(3.0, 3.0, 2.0);
+    let lookat = Vec3::new(0.0, 0.0, -1.0);
     let camera = Camera::new(
-        Vec3::new(-2.0, 2.0, 1.0),
-        Vec3::new(0.0, 0.0, -1.0),
+        lookfrom,
+        lookat,
         Vec3::new(0.0, 1.0, 0.0),
         20.0,
-        16.0 / 9.0
+        16.0 / 9.0,
+        2.0,
+        (lookfrom - lookat).length(),
     );
 
     // Render
@@ -77,7 +81,7 @@ fn main() {
                 let u = (i as f64 + rng.gen_range(0.0..1.0)) / (image_width as f64 - 1.0);
                 let v = (j as f64 + rng.gen_range(0.0..1.0)) / (image_height as f64 - 1.0);
                 // Vector from origin to pixel
-                let ray = camera.get_ray(u, v);
+                let ray = camera.get_ray(u, v, &mut rng);
                 pixel_color = pixel_color + ray_color(ray, &world, &mut rng, max_depth);
             }
             println!("{}", get_color(pixel_color, samples_per_pixel));
