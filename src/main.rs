@@ -118,7 +118,7 @@ fn main() -> std::io::Result<()> {
 
     // Camera
     let lookfrom = Vec3::new(13.0, 2.0, 3.0);
-    let lookat = Vec3::new(0.0, 0.0, -1.0);
+    let lookat = Vec3::new(0.0, 0.0, 0.0);
     let camera = Camera::new(
         lookfrom,
         lookat,
@@ -126,7 +126,7 @@ fn main() -> std::io::Result<()> {
         20.0,
         aspect_ratio,
         0.1,
-        (lookfrom - lookat).length(),
+        10.0,
     );
 
     // Render
