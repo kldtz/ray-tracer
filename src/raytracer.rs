@@ -1,26 +1,29 @@
 use std::io::{BufWriter, stdout, Write};
+
 use rand::prelude::ThreadRng;
 use rand::Rng;
-use crate::objects::{Hittable, Hittables};
+
 use crate::{Ray, Vec3};
 use crate::color::{BLACK, get_color};
 use crate::configs::ImageConfig;
+use crate::objects::{Hittable, Hittables};
 
 fn ray_color(ray: Ray, world: &Hittables, rng: &mut ThreadRng, depth: i64) -> Vec3 {
     if depth <= 0 {
-        return BLACK;
-    }
-    if let Some(hit) = world.hit(&ray, 0.001, f64::MAX) {
+        BLACK
+    } else if let Some(hit) = world.hit(&ray, 0.001, f64::MAX) {
         if let Some(scattered) = hit.material.scatter(&ray, &hit, rng) {
-            return hit.material.attenuate(ray_color(scattered, world, rng, depth - 1));
+            hit.material.attenuate(ray_color(scattered, world, rng, depth - 1))
+        } else {
+            BLACK
         }
-        return BLACK;
+    } else {
+        let unit_direction = ray.direction.unit_vector();
+        // Transform y-value from range [-1, 1] to [0, 1]
+        let t = 0.5 * (unit_direction.y + 1.0);
+        // Return linear interpolation between white (1, 1, 1) and blue (0.5, 0.7, 1)
+        (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
     }
-    let unit_direction = ray.direction.unit_vector();
-    // Transform y-value from range [-1, 1] to [0, 1]
-    let t = 0.5 * (unit_direction.y + 1.0);
-    // Return linear interpolation between white (1, 1, 1) and blue (0.5, 0.7, 1)
-    (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
 }
 
 /// Takes [ImageConfig] and renders PPM image to stdout.
