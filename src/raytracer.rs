@@ -4,7 +4,7 @@ use rand::prelude::ThreadRng;
 use rand::Rng;
 
 use crate::{Ray, Vec3};
-use crate::color::{BLACK, get_color};
+use crate::color::{BLACK, get_color, WHITE};
 use crate::configs::ImageConfig;
 use crate::objects::{Hittable, Hittables};
 
@@ -22,7 +22,7 @@ fn ray_color(ray: Ray, world: &Hittables, rng: &mut ThreadRng, depth: i64) -> Ve
         // Transform y-value from range [-1, 1] to [0, 1]
         let t = 0.5 * (unit_direction.y + 1.0);
         // Return linear interpolation between white (1, 1, 1) and blue (0.5, 0.7, 1)
-        (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
+        (1.0 - t) * WHITE + t * Vec3::new(0.5, 0.7, 1.0)
     }
 }
 

@@ -4,6 +4,7 @@ use crate::Vec3;
 const MIN_PERC: f64 = 0.0;
 const MAX_PERC: f64 = 0.999;
 pub const BLACK: Vec3 = Vec3 { x: 0.0, y: 0.0, z: 0.0 };
+pub const WHITE: Vec3 = Vec3 { x: 1.0, y: 1.0, z: 1.0 };
 
 pub fn get_color(pixel_color: Vec3, samples_per_pixel: i64) -> String {
     // Divide color by number of samples
