@@ -1,7 +1,7 @@
 use rand::rngs::ThreadRng;
 
-use crate::{Ray, Vec3};
 use crate::utils::degrees_to_radians;
+use crate::{Ray, Vec3};
 
 pub struct Camera {
     origin: Vec3,

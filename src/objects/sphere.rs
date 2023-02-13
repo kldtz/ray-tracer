@@ -1,17 +1,6 @@
-use crate::{Ray, Vec3};
+use crate::objects::hittable::{Hit, Hittable};
 use crate::material::Material;
-
-pub trait Hittable {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit>;
-}
-
-pub struct Hit<'a> {
-    pub point: Vec3,
-    pub normal: Vec3,
-    pub t: f64,
-    pub front_face: bool,
-    pub material: &'a Material,
-}
+use crate::{Ray, Vec3};
 
 pub struct Sphere {
     pub center: Vec3,
@@ -48,24 +37,5 @@ impl Hittable for Sphere {
         let normal = if front_face { outward_normal } else { -outward_normal };
 
         Some(Hit { point, normal, t, front_face, material: &self.material })
-    }
-}
-
-pub struct Hittables {
-    pub hittables: Vec<Box<dyn Hittable>>,
-}
-
-impl Hittable for Hittables {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
-        let mut hit: Option<Hit> = None;
-        let mut closest = t_max;
-
-        for hittable in self.hittables.iter() {
-            if let Some(h) = hittable.hit(ray, t_min, closest) {
-                closest = h.t;
-                hit = Some(h);
-            }
-        }
-        hit
     }
 }

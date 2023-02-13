@@ -2,7 +2,7 @@ use rand::Rng;
 use rand::rngs::ThreadRng;
 
 use crate::{Ray, Vec3};
-use crate::hits::Hit;
+use crate::objects::Hit;
 
 pub enum Material {
     Lambertian { albedo: Vec3 },
