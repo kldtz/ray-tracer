@@ -51,11 +51,11 @@ impl Hittable for Sphere {
     }
 }
 
-pub struct Hittables<T> {
-    pub hittables: Vec<T>,
+pub struct Hittables {
+    pub hittables: Vec<Box<dyn Hittable>>,
 }
 
-impl<T: Hittable> Hittable for Hittables<T> {
+impl Hittable for Hittables {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
         let mut hit: Option<Hit> = None;
         let mut closest = t_max;

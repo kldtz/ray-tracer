@@ -16,7 +16,7 @@ mod material;
 mod hits;
 mod camera;
 
-pub fn ray_color<T: Hittable>(ray: Ray, world: &Hittables<T>, rng: &mut ThreadRng, depth: i64) -> Vec3 {
+pub fn ray_color(ray: Ray, world: &Hittables, rng: &mut ThreadRng, depth: i64) -> Vec3 {
     if depth <= 0 {
         return BLACK;
     }
@@ -33,14 +33,14 @@ pub fn ray_color<T: Hittable>(ray: Ray, world: &Hittables<T>, rng: &mut ThreadRn
     (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
 }
 
-fn random_scene(rng: &mut ThreadRng) -> Hittables<Sphere> {
-    let mut hittables: Vec<Sphere> = Vec::new();
+fn random_scene(rng: &mut ThreadRng) -> Hittables {
+    let mut hittables: Vec<Box<dyn Hittable>> = Vec::new();
     let ground_material = Material::Lambertian { albedo: Vec3::new(0.5, 0.5, 0.5) };
-    hittables.push(Sphere {
+    hittables.push(Box::new(Sphere {
         center: Vec3::new(0.0, -1000.0, 0.0),
         radius: 1000.0,
         material: ground_material,
-    });
+    }));
 
     // Small spheres
     for a in -11..11 {
@@ -75,30 +75,30 @@ fn random_scene(rng: &mut ThreadRng) -> Hittables<Sphere> {
                     // Glass
                     Sphere { center, radius: 0.2, material: Material::Dielectric { refractive_index: 1.5 } }
                 };
-                hittables.push(sphere);
+                hittables.push(Box::new(sphere));
             }
         }
     }
 
     // Large spheres
     // Glass
-    hittables.push(Sphere {
+    hittables.push(Box::new(Sphere {
         center: Vec3::new(0.0, 1.0, 0.0),
         radius: 1.0,
         material: Material::Dielectric {refractive_index: 1.5},
-    });
+    }));
     // Diffuse
-    hittables.push(Sphere {
+    hittables.push(Box::new(Sphere {
         center: Vec3::new(-4.0, 1.0, 0.0),
         radius: 1.0,
         material: Material::Lambertian {albedo: Vec3::new(0.4, 0.2, 0.1)},
-    });
+    }));
     // Metal
-    hittables.push(Sphere {
+    hittables.push(Box::new(Sphere {
         center: Vec3::new(4.0, 1.0, 0.0),
         radius: 1.0,
         material: Material::Metal {albedo: Vec3::new(0.7, 0.6, 0.5), fuzz: 0.0},
-    });
+    }));
 
     Hittables { hittables }
 }
