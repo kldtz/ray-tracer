@@ -1,7 +1,9 @@
 pub use hittable::*;
-pub use sphere::*;
 pub use hittables::*;
+pub use moving_sphere::*;
+pub use sphere::*;
 
 mod hittable;
 mod sphere;
+mod moving_sphere;
 mod hittables;

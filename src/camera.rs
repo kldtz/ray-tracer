@@ -1,7 +1,8 @@
+use rand::Rng;
 use rand::rngs::ThreadRng;
 
-use crate::utils::degrees_to_radians;
 use crate::{Ray, Vec3};
+use crate::utils::degrees_to_radians;
 
 pub struct Camera {
     origin: Vec3,
@@ -11,6 +12,8 @@ pub struct Camera {
     u: Vec3,
     v: Vec3,
     lens_radius: f64,
+    time0: f64,
+    time1: f64,
 }
 
 impl Camera {
@@ -22,6 +25,8 @@ impl Camera {
         aspect_ratio: f64,
         aperture: f64,
         focus_dist: f64,
+        time0: f64,
+        time1: f64,
     ) -> Self {
         let theta = degrees_to_radians(vfov);
         let h = (theta / 2.0).tan();
@@ -40,7 +45,7 @@ impl Camera {
 
         let lens_radius = aperture / 2.0;
 
-        Camera { origin, lower_left_corner, horizontal, vertical, u, v, lens_radius }
+        Camera { origin, lower_left_corner, horizontal, vertical, u, v, lens_radius, time0, time1 }
     }
 
     pub fn get_ray(&self, s: f64, t: f64, rng: &mut ThreadRng) -> Ray {
@@ -49,6 +54,11 @@ impl Camera {
 
         let origin = self.origin + offset;
         let direction = self.lower_left_corner + s * self.horizontal + t * self.vertical - self.origin - offset;
-        Ray { origin, direction }
+        let time = if self.time0 == self.time1 {
+            0.0
+        } else {
+            rng.gen_range(self.time0..self.time1)
+        };
+        Ray { origin, direction, time }
     }
 }

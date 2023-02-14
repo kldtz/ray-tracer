@@ -18,7 +18,7 @@ impl Material {
                 if scatter_direction.near_zero() {
                     scatter_direction = hit.normal;
                 }
-                Some(Ray { origin: hit.point, direction: scatter_direction })
+                Some(Ray { origin: hit.point, direction: scatter_direction, time: ray.time })
             }
             Material::Metal { albedo: _, fuzz } => {
                 let reflected = reflect(ray.direction.unit_vector(), hit.normal);
@@ -26,6 +26,7 @@ impl Material {
                     Some(Ray {
                         origin: hit.point,
                         direction: reflected + fuzz * Vec3::random_in_unit_sphere(rng),
+                        time: ray.time,
                     })
                 } else {
                     None
@@ -45,7 +46,7 @@ impl Material {
                 } else {
                     refract(unit_direction, hit.normal, refraction_ratio)
                 };
-                Some(Ray { origin: hit.point, direction })
+                Some(Ray { origin: hit.point, direction, time: ray.time })
             }
         }
     }
